@@ -1,9 +1,13 @@
 const multer = require('multer');
 const path = require('path');
+const os = require('os');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, "./public/temp");
+        // cb(null, "./public/temp"); // Original local path
+        
+        // Use os.tmpdir() which works on both Vercel (linux) and local (windows/linux)
+        cb(null, os.tmpdir());
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
