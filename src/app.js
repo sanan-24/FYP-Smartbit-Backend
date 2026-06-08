@@ -33,6 +33,14 @@ const reviewRouter = require('./routes/review.routes');
 const favoriteRouter = require('./routes/favorite.routes');
 
 // Routes declaration
+app.get("/", (req, res) => {
+    res.json({
+        message: "SmartBite Backend is running!",
+        version: "v1",
+        status: "Online"
+    });
+});
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/profile", profileRouter);
 app.use("/api/v1/categories", categoryRouter);
