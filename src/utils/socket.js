@@ -55,7 +55,8 @@ const initializeSocket = (server) => {
 
 const getIO = () => {
     if (!io) {
-        throw new Error("Socket.io not initialized!");
+        // Return null safely — Socket.io may not be initialized on serverless environments
+        return null;
     }
     return io;
 };

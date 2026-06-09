@@ -89,10 +89,12 @@ class OrderService {
         });
         
         const io = getIO();
-        io.to("admin_room").emit('new_order_placed', {
-            order: createdOrder,
-            message: "New order received!"
-        });
+        if (io) {
+            io.to("admin_room").emit('new_order_placed', {
+                order: createdOrder,
+                message: "New order received!"
+            });
+        }
 
         return createdOrder;
     }
