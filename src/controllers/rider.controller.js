@@ -4,13 +4,13 @@ const { asyncHandler } = require('../utils/AsyncHandler');
 const { ApiError } = require('../utils/ApiError');
 
 const createRider = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, firstName, lastName, phoneNumber } = req.body;
 
-    if (!email || !password) {
-        throw new ApiError(400, 'Email and password are required');
+    if (!email || !password || !firstName || !lastName || !phoneNumber) {
+        throw new ApiError(400, 'All fields (email, password, firstName, lastName, phoneNumber) are required');
     }
 
-    const rider = await RiderService.createRider({ email, password });
+    const rider = await RiderService.createRider({ email, password, firstName, lastName, phoneNumber });
 
     return res.status(201).json(
         new ApiResponse(201, rider, 'Rider created successfully')

@@ -3,7 +3,7 @@ const { ApiError } = require('../utils/ApiError');
 
 class RiderService {
     static async createRider(riderData) {
-        const { email, password } = riderData;
+        const { email, password, firstName, lastName, phoneNumber } = riderData;
 
         const existedUser = await User.findOne({ email });
         if (existedUser) {
@@ -18,8 +18,27 @@ class RiderService {
             isAvailable: true
         });
 
+        // Create Profile for the new rider
+        const Profile = require('../models/profile.model');
+        await Profile.create({
+            user: rider._id,
+            firstName: firstName || 'Rider',
+            lastName: lastName || (email.split('@')[0]),
+            phoneNumber: phoneNumber || '',
+            profilePhoto: 'https://res.cloudinary.com/ds6vjafm3/image/upload/v1714123456/default_avatar.png' // Default image
+        });
+
         const createdRider = await User.findById(rider._id).select('-password -refreshToken');
-        return createdRider;
+        
+        return {
+            _id: createdRider._id,
+            email: createdRider.email,
+            isAvailable: createdRider.isAvailable,
+            isActive: createdRider.isVerified,
+            firstName: firstName || 'Rider',
+            lastName: lastName || (email.split('@')[0]),
+            phoneNumber: phoneNumber || ''
+        };
     }
 
     static async getAvailableRiders() {
