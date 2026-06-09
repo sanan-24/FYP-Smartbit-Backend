@@ -29,9 +29,11 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
     const { loggedInUser, accessToken, refreshToken } = await AuthService.loginUser({ email, password });
 
+    const isProduction = process.env.NODE_ENV === "production";
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production"
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
     };
 
     return res
@@ -54,9 +56,11 @@ const loginUser = asyncHandler(async (req, res, next) => {
 const logoutUser = asyncHandler(async (req, res, next) => {
     await AuthService.logoutUser(req.user._id);
 
+    const isProduction = process.env.NODE_ENV === "production";
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production"
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
     };
 
     return res
@@ -75,9 +79,11 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
 
     const { accessToken, newRefreshToken } = await AuthService.refreshAccessToken(incomingRefreshToken);
 
+    const isProduction = process.env.NODE_ENV === "production";
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production"
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
     };
 
     return res

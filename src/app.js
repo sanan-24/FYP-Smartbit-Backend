@@ -6,10 +6,27 @@ const { errorHandler } = require('./middlewares/error.middleware');
 
 const app = express();
 
+// ✅ CORS — multiple origins support (local + production)
+const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3000",
+    process.env.CORS_ORIGIN,          // production frontend URL (Vercel)
+    process.env.CORS_ORIGIN_SECONDARY, // optional secondary URL
+].filter(Boolean); // undefined entries hata do
+
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+    origin: (origin, callback) => {
+        // Allow requests with no origin (mobile apps, Postman, curl)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error(`CORS: Origin '${origin}' is not allowed`), false);
+    },
     credentials: true
 }));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
