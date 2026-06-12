@@ -1,19 +1,32 @@
 const nodemailer = require('nodemailer');
 
-const createTransporter = () => {
-    return nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        secure: process.env.EMAIL_PORT == 465,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        }
-    });
+// Create a single transporter instance for reuse
+let transporter = null;
+
+const getTransporter = () => {
+    if (!transporter) {
+        transporter = nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,
+            port: process.env.EMAIL_PORT,
+            secure: process.env.EMAIL_PORT == 465,
+            pool: true, // Use connection pooling for speed
+            maxConnections: 5,
+            maxMessages: 100,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            },
+            // Increase timeouts for live environment stability
+            connectionTimeout: 10000, 
+            greetingTimeout: 10000,
+            socketTimeout: 30000
+        });
+    }
+    return transporter;
 };
 
 const sendEmail = async (options) => {
-    const transporter = createTransporter();
+    const mailTransporter = getTransporter();
     const mailOptions = {
         from: process.env.EMAIL_FROM,
         to: options.email,
@@ -22,7 +35,14 @@ const sendEmail = async (options) => {
         html: options.html,
     };
 
-    await transporter.sendMail(mailOptions);
+    try {
+        await mailTransporter.sendMail(mailOptions);
+    } catch (error) {
+        console.error("Internal Email Error:", error);
+        // If connection failed, reset transporter so next attempt creates a new one
+        transporter = null;
+        throw error;
+    }
 };
 
 const sendVerificationEmail = async (email, token) => {
