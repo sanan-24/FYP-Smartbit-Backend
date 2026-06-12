@@ -19,55 +19,41 @@ const sendEmail = async (options) => {
         to: options.email,
         subject: options.subject,
         text: options.message,
-        html: options.html
+        html: options.html,
     };
 
     await transporter.sendMail(mailOptions);
 };
 
 const sendVerificationEmail = async (email, token) => {
-    const verificationUrl = `${process.env.APP_URL || 'http://localhost:8000'}/api/v1/auth/verify-email?token=${token}`;
+    const verificationUrl = `${process.env.APP_URL || 'http://localhost:3000'}/verify-email?token=${token}`;
     
     const html = `
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
+        <meta charset="UTF-8">
         <style>
-            .card {
-                max-width: 400px;
-                margin: auto;
-                padding: 20px;
-                border: 1px solid #ddd;
-                border-radius: 10px;
-                font-family: Arial, sans-serif;
-                text-align: center;
-                background-color: #f9f9f9;
-            }
-            .button {
-                display: inline-block;
-                padding: 12px 24px;
-                margin-top: 20px;
-                background-color: #007bff;
-                color: #ffffff !important;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: bold;
-            }
-            .footer {
-                margin-top: 20px;
-                font-size: 12px;
-                color: #777;
-            }
+            body { font-family: Arial, sans-serif; color: #333; line-height: 1.5; }
+            .container { max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px; }
+            .button { display: inline-block; padding: 10px 20px; background-color: #ff4d30; color: #ffffff !important; text-decoration: none; border-radius: 5px; font-weight: bold; }
+            .footer { font-size: 12px; color: #888; margin-top: 20px; }
         </style>
     </head>
     <body>
-        <div class="card">
-            <h2>Email Verification</h2>
-            <p>Thank you for registering! Please click the button below to verify your email address.</p>
-            <a href="${verificationUrl}" class="button">Verify Email</a>
+        <div class="container">
+            <h2>Verify your email address</h2>
+            <p>Hi,</p>
+            <p>Thanks for signing up for Smart Bite! Please click the button below to verify your email address and complete your registration.</p>
+            <p style="text-align: center; margin: 30px 0;">
+                <a href="${verificationUrl}" class="button">Verify Email Address</a>
+            </p>
+            <p>If you did not create an account, no further action is required.</p>
+            <p>Best regards,<br>The Smart Bite Team</p>
             <div class="footer">
-                <p>If the button doesn't work, copy and paste this link into your browser:</p>
-                <p>${verificationUrl}</p>
+                <hr style="border: none; border-top: 1px solid #eee;">
+                <p>If you're having trouble clicking the "Verify Email Address" button, copy and paste the URL below into your web browser:</p>
+                <p style="word-break: break-all;">${verificationUrl}</p>
             </div>
         </div>
     </body>
@@ -76,8 +62,8 @@ const sendVerificationEmail = async (email, token) => {
 
     await sendEmail({
         email,
-        subject: 'Verify Your Email Address',
-        message: `Please verify your email by clicking the link: ${verificationUrl}`,
+        subject: 'Verify your Smart Bite account',
+        message: `Verify your email address by clicking this link: ${verificationUrl}`,
         html
     });
 };
@@ -85,42 +71,24 @@ const sendVerificationEmail = async (email, token) => {
 const sendOTPEmail = async (email, otp) => {
     const html = `
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
+        <meta charset="UTF-8">
         <style>
-            .card {
-                max-width: 400px;
-                margin: auto;
-                padding: 20px;
-                border: 1px solid #ddd;
-                border-radius: 10px;
-                font-family: Arial, sans-serif;
-                text-align: center;
-                background-color: #f9f9f9;
-            }
-            .otp {
-                font-size: 32px;
-                font-weight: bold;
-                letter-spacing: 5px;
-                color: #007bff;
-                margin: 20px 0;
-            }
-            .footer {
-                margin-top: 20px;
-                font-size: 12px;
-                color: #777;
-            }
+            body { font-family: Arial, sans-serif; color: #333; line-height: 1.5; }
+            .container { max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px; }
+            .otp { font-size: 24px; font-weight: bold; color: #ff4d30; letter-spacing: 2px; text-align: center; margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 5px; }
+            .footer { font-size: 12px; color: #888; margin-top: 20px; }
         </style>
     </head>
     <body>
-        <div class="card">
-            <h2>Password Reset OTP</h2>
-            <p>You requested to reset your password. Use the following OTP to proceed:</p>
+        <div class="container">
+            <h2>Password Reset Code</h2>
+            <p>Hi,</p>
+            <p>You requested to reset your password. Use the following code to proceed:</p>
             <div class="otp">${otp}</div>
-            <p>This OTP is valid for 10 minutes.</p>
-            <div class="footer">
-                <p>If you didn't request this, please ignore this email.</p>
-            </div>
+            <p>This code is valid for 10 minutes. If you did not request this, please ignore this email.</p>
+            <p>Best regards,<br>The Smart Bite Team</p>
         </div>
     </body>
     </html>
@@ -128,8 +96,8 @@ const sendOTPEmail = async (email, otp) => {
 
     await sendEmail({
         email,
-        subject: 'Password Reset OTP',
-        message: `Your password reset OTP is: ${otp}. It is valid for 10 minutes.`,
+        subject: 'Your Smart Bite reset code',
+        message: `Your Smart Bite password reset code is: ${otp}. It is valid for 10 minutes.`,
         html
     });
 };

@@ -170,6 +170,7 @@ class OrderService {
         return await Order.find()
             .populate('customer', 'email')
             .populate('items.product', 'name')
+            .populate('rider', 'firstName lastName email phoneNumber')
             .sort({ createdAt: -1 });
     }
 
@@ -232,7 +233,9 @@ class OrderService {
             }
         }
 
-        return await Order.findById(orderId).populate('customer', 'email');
+        return await Order.findById(orderId)
+            .populate('customer', 'email')
+            .populate('rider', 'firstName lastName email phoneNumber');
     }
 
     static async updatePaymentStatus(orderId, paymentStatus) {
@@ -309,7 +312,9 @@ class OrderService {
             }
         });
 
-        return await Order.findById(orderId).populate('rider', 'email');
+        return await Order.findById(orderId)
+            .populate('customer', 'email')
+            .populate('rider', 'firstName lastName email phoneNumber');
     }
 }
 

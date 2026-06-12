@@ -42,8 +42,8 @@ class AuthService {
             throw new ApiError(500, "Something went wrong while registering the user");
         }
 
-        // Send verification email
-        await sendVerificationEmail(email, verificationToken);
+        // Send verification email in background to speed up response
+        sendVerificationEmail(email, verificationToken).catch(err => console.error("Email sending failed:", err));
 
         return createdUser;
     }
@@ -134,7 +134,8 @@ class AuthService {
         user.resetPasswordOTPExpiry = Date.now() + 10 * 60 * 1000; // 10 mins
         await user.save({ validateBeforeSave: false });
 
-        await sendOTPEmail(email, otp);
+        // Send OTP email in background
+        sendOTPEmail(email, otp).catch(err => console.error("OTP Email sending failed:", err));
 
         return true;
     }
